@@ -26,7 +26,7 @@ module.exports = (paths) => {
             ]
         },
         plugins: [
-            new extractTextPlugin('./css/style.css'),
+            new extractTextPlugin('./css/style.min.css'),
             new OptimizeCssAssetsPlugin({
                 assetNameRegExp: /\.min\.css$/g,
                 cssProcessor: cssNano,

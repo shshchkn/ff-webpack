@@ -23,7 +23,7 @@ const common = merge(
         },
         output: {
           path: PATHS.build,
-          filename: 'js/[name].js'
+          filename: 'js/[name].min.js'
         },
         devtool: 'source-map',
         plugins: [

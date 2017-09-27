@@ -1,8 +1,38 @@
 extends ../layout
 
 block vars
-	- var title = "Webpack App Index Page"
+	- var title = "Другофильтр"
 
 block main
-	img(src=require("./webpack.svg") width="100")
-	h1 Index page new
+
+	.ff-wrap
+
+		.ff-logo
+			img(src=require("./ff-logo.svg"))
+
+		.ff-container
+
+			.ff-header
+				span.ff-header__title Выберите друзей
+
+			.ff-body
+				.ff-body__left
+					.ff-body__left_search
+						.ff-body__left_search-input
+							input(type="text", id="leftSearch", placeholder="Начните вводить имя друга")
+					.ff-body__left_list
+						p Ваши друзья
+						.ff-body__left_friends
+							ul#allFriends
+
+				.ff-body__right
+					.ff-body__right_search
+						.ff-body__right_search-input
+							input(type="text", id="rightSearch", placeholder="Начните вводить имя друга")
+					.ff-body__right_list
+						p Друзья в списке
+						.ff-body__right_friends
+							ul#listFriends.droppable
+
+			.ff-footer
+				button.ff-footer__save(type="button") Сохранить

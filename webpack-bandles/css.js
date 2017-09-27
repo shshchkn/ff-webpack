@@ -1,3 +1,4 @@
+
 module.exports = (paths) => {
     return {
         module: {

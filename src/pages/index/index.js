@@ -17,19 +17,19 @@ function isMatching(name, input) {
     return name.toLowerCase().includes(input.toLowerCase());
 }
 
-function dnd(objects, dropZone, col1, col2, btnClass, btnId) {
-    if (objects) {
-        [].forEach.call(objects, el => {
+function dnd(params) {
+    if (params.from) {
+        [].forEach.call(params.from, el => {
             el.addEventListener('dragstart', dragStart);
         });
     }
 
-    if (dropZone) {
-        dropZone.addEventListener('dragenter', dragEnter);
-        dropZone.addEventListener('dragleave', dragLeave);
-        dropZone.addEventListener('dragover', dragOver);
-        dropZone.addEventListener('drop', dragDrop);
-        dropZone.addEventListener('dragend', sortList(col2));
+    if (params.to) {
+        params.to.addEventListener('dragenter', dragEnter);
+        params.to.addEventListener('dragleave', dragLeave);
+        params.to.addEventListener('dragover', dragOver);
+        params.to.addEventListener('drop', dragDrop);
+        params.to.addEventListener('dragend', sortList(params.arr2));
     }
 
     function dragStart(e) {
@@ -58,16 +58,19 @@ function dnd(objects, dropZone, col1, col2, btnClass, btnId) {
             elem = document.getElementById(elemID),
             button = elem.querySelector('.fa');
 
-        if (dropZone) {
-            button.className = 'fa fa-' + btnClass;
-            button.parentNode.id = btnId;
-            dropZone.appendChild(elem);
-            for (let i = 0; i < col1.length; i++) {
-                if (col1[i].id === Number(elemID)) {
-                    col2.push(col1[i]);
-                    col1.splice(i, 1);
+        if (params.to) {
+            button.className = 'fa fa-' + params.cls;
+            button.parentNode.id = params.id;
+
+            for (let i = 0; i < params.arr1.length; i++) {
+                if (params.arr1[i].id === Number(elemID)) {
+                    params.arr2.push(params.arr1[i]);
+                    params.arr1.splice(i, 1);
                 }
             }
+
+            params.to.appendChild(elem);
+            params.search.value = '';
         }
 
         return false;
@@ -83,6 +86,8 @@ function createList(tpl, list, el) {
         template = render({output: tpl});
 
     list.innerHTML = template;
+
+    return list.innerHTML;
 }
 
 function sortList(obj) {
@@ -122,7 +127,7 @@ function btnAction(e, list, icon, col1, col2) {
 
 const promise = new Promise((resolve, reject) => {
     VK.init({
-        apiId: 6191259
+        apiId: 6200015
     });
 
     VK.Auth.login(data => {
@@ -139,7 +144,7 @@ const promise = new Promise((resolve, reject) => {
 promise
     .then(() => {
 
-        return api('friends.get', {v: 5.68, fields: 'first_name, last_name, photo_50', count: 16});
+        return api('friends.get', {v: 5.68, fields: 'first_name, last_name, photo_50', count: 30});
     })
     .then(data => {
         let leftCol = [],
@@ -171,8 +176,28 @@ promise
         createList(leftCol, allFriends, 'leftTemplate');
         createList(rightCol, listFriends, 'rightTemplate');
 
-        dnd(allFriends.children, listFriends, leftCol, rightCol, 'close', 'btnDel');
-        dnd(listFriends.children, allFriends, rightCol, leftCol, 'plus', 'btnAdd');
+        let dndToRight = {
+            from: allFriends.children,
+            to: listFriends,
+            arr1: leftCol,
+            arr2: rightCol,
+            cls: 'close',
+            id: 'btnDel',
+            search: rightSearch
+        };
+
+        let dndToLeft = {
+            from: listFriends.children,
+            to: allFriends,
+            arr1: rightCol,
+            arr2: leftCol,
+            cls: 'plus',
+            id: 'btnAdd',
+            search: leftSearch
+        };
+
+        dnd(dndToRight);
+        dnd(dndToLeft);
 
         document.body.addEventListener('click', (e) => {
             e.preventDefault();
@@ -207,7 +232,7 @@ promise
                 createList(leftCol, allFriends, 'leftTemplate');
             }
 
-            dnd(allFriends.children, listFriends, leftCol, rightCol, 'close', 'btnDel');
+            dnd(dndToRight);
         });
 
         rightSearch.addEventListener('keyup', () => {
@@ -231,12 +256,13 @@ promise
                 createList(rightCol, listFriends, 'rightTemplate');
             }
 
-            dnd(listFriends.children, allFriends, rightCol, leftCol, 'plus', 'btnAdd');
+            dnd(dndToLeft);
         });
 
         let save = document.querySelector('.ff-footer__save');
 
         save.addEventListener('click', () => {
+            localStorage.clear();
             localStorage.all = JSON.stringify(leftCol);
             localStorage.added = JSON.stringify(rightCol);
             alert('Данные сохранены!');

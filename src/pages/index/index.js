@@ -103,24 +103,30 @@ function sortList(obj) {
     });
 }
 
-function btnAction(e, list, icon, col1, col2) {
+function btnAction(e, params) {
     let item = e.target.closest('li');
 
-    list.appendChild(item);
+    params.list.appendChild(item);
     e.target.parentNode.remove();
 
     let close = document.createElement('i'),
         btn = document.createElement('button');
 
-    close.className = `fa fa-${icon}`;
+    close.className = `fa fa-${params.icon}`;
     item.appendChild(btn);
     btn.appendChild(close);
 
-    for (let i = 0; i < col1.length; i++) {
-        if (col1[i].id === Number(item.id)) {
-            col2.push(col1[i]);
-            col1.splice(i, 1);
+    for (let i = 0; i < params.arr1.length; i++) {
+        if (params.arr1[i].id === Number(item.id)) {
+            params.arr2.push(params.arr1[i]);
+            params.arr1.splice(i, 1);
         }
+    }
+
+    if (params.search.value !== '') {
+        params.search.value = '';
+        let search = new Event('keyup');
+        params.search.dispatchEvent(search);
     }
 }
 
@@ -204,11 +210,27 @@ promise
             e.preventDefault();
 
             if (e.target.className === 'fa fa-plus'){
-                btnAction(e, listFriends, 'close', leftCol, rightCol);
+                let params = {
+                    icon: 'close',
+                    list: listFriends,
+                    arr1: leftCol,
+                    arr2: rightCol,
+                    search: rightSearch
+                };
+
+                btnAction(e, params);
             }
 
             if (e.target.className === 'fa fa-close') {
-                btnAction(e, allFriends, 'plus', rightCol, leftCol);
+                let params = {
+                    icon: 'plus',
+                    list: allFriends,
+                    arr1: rightCol,
+                    arr2: leftCol,
+                    search: leftSearch
+                };
+
+                btnAction(e, params);
             }
         });
 

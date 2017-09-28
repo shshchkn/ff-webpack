@@ -24,56 +24,57 @@ function dnd(params) {
         });
     }
 
+    function dragStart(e) {
+        e.dataTransfer.dropEffect = 'move';
+        e.dataTransfer.setData('text', e.target.getAttribute('id'));
+    }
+
     if (params.to) {
         params.to.addEventListener('dragenter', dragEnter);
         params.to.addEventListener('dragleave', dragLeave);
         params.to.addEventListener('dragover', dragOver);
         params.to.addEventListener('drop', dragDrop);
         params.to.addEventListener('dragend', sortList(params.arr2));
-    }
 
-    function dragStart(e) {
-        e.dataTransfer.dropEffect = 'move';
-        e.dataTransfer.setData('text', e.target.getAttribute('id'));
 
-        return false;
-    }
 
-    function dragEnter(e) {
-        e.preventDefault();
-    }
-
-    function dragLeave(e) {
-        e.preventDefault();
-    }
-
-    function dragOver(e) {
-        e.preventDefault();
-    }
-
-    function dragDrop(e) {
-        e.preventDefault();
-
-        let elemID = e.dataTransfer.getData('text'),
-            elem = document.getElementById(elemID),
-            button = elem.querySelector('.fa');
-
-        if (params.to) {
-            button.className = 'fa fa-' + params.cls;
-            button.parentNode.id = params.id;
-
-            for (let i = 0; i < params.arr1.length; i++) {
-                if (params.arr1[i].id === Number(elemID)) {
-                    params.arr2.push(params.arr1[i]);
-                    params.arr1.splice(i, 1);
-                }
-            }
-
-            params.to.appendChild(elem);
-            params.search.value = '';
+        function dragEnter(e) {
+            e.preventDefault();
         }
 
-        return false;
+        function dragLeave(e) {
+            e.preventDefault();
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function dragDrop(e) {
+            if (params.to) {
+                let elemID = e.dataTransfer.getData('text'),
+                    elem = document.getElementById(elemID),
+                    button = elem.querySelector('.fa');
+
+
+                button.className = 'fa fa-' + params.cls;
+                button.parentNode.id = params.id;
+                params.to.appendChild(elem);
+
+                for (let i = 0; i < params.arr1.length; i++) {
+                    if (params.arr1[i].id === Number(elemID)) {
+                        params.arr2.push(params.arr1[i]);
+                        params.arr1.splice(i, 1);
+                    }
+                }
+
+                if (params.search.value !== '') {
+                    params.search.value = '';
+                    let search = new Event('keyup');
+                    params.search.dispatchEvent(search);
+                }
+            }
+        }
     }
 }
 
@@ -86,8 +87,6 @@ function createList(tpl, list, el) {
         template = render({output: tpl});
 
     list.innerHTML = template;
-
-    return list.innerHTML;
 }
 
 function sortList(obj) {
@@ -183,7 +182,8 @@ promise
             arr2: rightCol,
             cls: 'close',
             id: 'btnDel',
-            search: rightSearch
+            search: rightSearch,
+            tpl: 'rightTemplate'
         };
 
         let dndToLeft = {
@@ -193,7 +193,8 @@ promise
             arr2: leftCol,
             cls: 'plus',
             id: 'btnAdd',
-            search: leftSearch
+            search: leftSearch,
+            tpl: 'leftTemplate'
         };
 
         dnd(dndToRight);
@@ -271,4 +272,3 @@ promise
     .catch(e => {
         alert('Ошибка ' + e.message, e.name, e.stack);
     });
-

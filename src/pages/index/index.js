@@ -36,8 +36,6 @@ function dnd(params) {
         params.to.addEventListener('drop', dragDrop);
         params.to.addEventListener('dragend', sortList(params.arr2));
 
-
-
         function dragEnter(e) {
             e.preventDefault();
         }
@@ -55,7 +53,6 @@ function dnd(params) {
                 let elemID = e.dataTransfer.getData('text'),
                     elem = document.getElementById(elemID),
                     button = elem.querySelector('.fa');
-
 
                 button.className = 'fa fa-' + params.cls;
                 button.parentNode.id = params.id;
